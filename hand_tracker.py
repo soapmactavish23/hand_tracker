@@ -46,6 +46,18 @@ class Detector:
 
         return img
 
+    def find_position(self, img: webcam_image, hand_number: int = 0):
+        self.required_landmark_list = []
+
+        if self.results.multi_hand_landmarks:
+            height, width, _ = img.shape
+            my_hand = self.results. multi_hand_landmarks[hand_number]
+            for id, lm in enumerate(my_hand.landmark):
+                center_x, center_y = int(lm.x * width), int(lm.y * height)
+
+                self.required_landmark_list.append([id, center_x, center_y])
+
+        return self.required_landmark_list
 
 # Teste de classe ====================
 if __name__ == "__main__":
@@ -60,6 +72,9 @@ if __name__ == "__main__":
 
         # Manipulação de frame
         img = Detect.find_hands(img)
+        landmark_list = Detect.find_position(img)
+        if landmark_list:
+            print(landmark_list[8])
 
         # Mostrando o frame
         cv2.imshow("Image", img)
