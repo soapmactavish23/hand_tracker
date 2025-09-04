@@ -30,18 +30,38 @@ class Detector:
                                          self.complexity,
                                          self.detection_con,
                                          self.tracking_con)
+        self.mp_draw = mp.solutions.drawing_utils
         self.tip_ids = [4, 8, 12, 16, 20]
+
+    def find_hands(self, img: webcam_image, draw_hands: bool = True):
+        # Correção de cor
+        img_RBG = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        # Coletar resultados do processo das hands e analisar
+        self.results = self.hands.process(img_RBG)
+
+        if self.results.multi_hand_landmarks and draw_hands:
+            for hand in self.results.multi_hand_landmarks:
+                self.mp_draw.draw_landmarks(img, hand, self.mp_hands.HAND_CONNECTIONS)
+
+        return img
 
 
 # Teste de classe ====================
 if __name__ == "__main__":
     Detect = Detector()
 
+    # Captura da imagem
     capture = cv2.VideoCapture(0)
 
     while True:
+        # Captura do frame
         _, img = capture.read()
 
+        # Manipulação de frame
+        img = Detect.find_hands(img)
+
+        # Mostrando o frame
         cv2.imshow("Image", img)
 
         if cv2.waitKey(20) & 0xFF == ord('q'):
